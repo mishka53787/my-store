@@ -1,0 +1,25 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+ background-image: image(home\my-store\client\public\images\back);
+}
+
+a {
+  color: #00B7FF;
+}
+
+nav{
+  text-align: center;
+ color: black;
+
+}
+
+Footer{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background-color: #333; /* Background color for the header */
+  color: #fff; /* Text color */
+  border: #333;
+}
