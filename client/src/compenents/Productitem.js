@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function ProductItem({ name, price, onAddToCart }) {
+function ProductItem({ name, price, image, onAddToCart }) {
   const [isAdded, setIsAdded] = useState(false);
 
   const handleAddToCart = () => {
@@ -29,6 +29,7 @@ function ProductItem({ name, price, onAddToCart }) {
     <div>
       <h1>{name}</h1>
       <img src={process.env.PUBLIC_URL + `/images/${name}.jpeg`} alt={`Product: ${name}`} />
+
       <p>Price: {price}</p>
       <button onClick={handleAddToCart}>Add to Cart</button>
       {isAdded && <p>Item has been added to the cart!</p>}
@@ -37,6 +38,7 @@ function ProductItem({ name, price, onAddToCart }) {
 }
 
 export default ProductItem;
+
 
 
 

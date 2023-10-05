@@ -31,7 +31,7 @@ Before you begin, ensure you have met the following requirements:
 
    Navigate to the project directory:
 
-   cd my-store
+   cd my-store  cd server
 
    Install project dependencies:
 
@@ -58,3 +58,31 @@ jest: JavaScript testing framework.
 react-testing-library: Testing utilities for React components.
 You can find the full list of dependencies in the package.json file
 
+Testing
+You can run tests for the application using the following command:
+
+npm test
+
+This will launch the test runner in interactive watch mode.
+
+Deployment
+To deploy the application for production, you can build it using:
+
+npm run build
+
+This command will create an optimized build of the application in the build folder, which you can then deploy to a hosting service of your choice.
+
+Contributing
+Contributions are welcome! If you'd like to contribute to this project, please follow these steps:
+
+Fork the project.
+Create a new branch for your feature or bug fix.
+Make your changes and commit them.
+Push your changes to your fork.
+Create a pull request to the main repository.
+
+License
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+
+Feel free to replace the placeholders with actual links, project names, and descriptions to provide detailed information about your e-commerce web application.

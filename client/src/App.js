@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes,  Navigate } from 'react-router-dom'; // Import useLocation
 import Home from './compenents/Home';
 import Contact from './compenents/Contact';
 import Registration from './compenents/registration';
@@ -9,10 +9,13 @@ import Header from './compenents/Header';
 import ShoppingCart from './compenents/ShopCart'; // Import the ShoppingCart component
 import Footer from './compenents/Footer';
 import RoleBasedComponent from './compenents/RoleBasedComponent';
-
+import AdminDashboard from './compenents/AdminDashboard';
 
 function App() {
   const [cartItems, setCartItems] = useState([]);
+
+  
+
 
   // Function to remove items from the cart
   const removeFromCart = (index) => {
@@ -25,10 +28,12 @@ function App() {
   const clearCart = () => {
     setCartItems([]);
   };
+
   const user = {
     role: 'admin', // This can be 'admin', 'user', or any other role
   };
 
+  const [userRole] = useState('admin'); // Set the user's role
 
   return (
     <Router>
@@ -38,9 +43,13 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/products" element={<Products />} />
             <Route path="/registration" element={<Registration />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/admin" element={userRole === 'admin' ? <AdminDashboard /> : <Navigate to="/" />} />
+            <Route
+    path="/products"
+    element={<Products userRole={user.role} />} // Pass the user's role as a prop
+  />
             <Route
               path="/Cart"
               element={
@@ -53,23 +62,27 @@ function App() {
             />
           </Routes>
         </div>
+        
         <RoleBasedComponent userRole={user.role} allowedRoles={['admin']}>
-        {/* Content or actions restricted to admin users */}
-        <button onClick={() => console.log('Admin action')}>Admin Action</button>
-      </RoleBasedComponent>
+          {/* Content or actions restricted to admin users */}
+          <button onClick={() => console.log('Admin action')}>Admin Action</button>
+        </RoleBasedComponent>
 
-      <RoleBasedComponent userRole={user.role} allowedRoles={['user']}>
-        {/* Content or actions restricted to regular users */}
-        <button onClick={() => console.log('User action')}>User Action</button>
-      </RoleBasedComponent>
+        <RoleBasedComponent userRole={user.role} allowedRoles={['user']}>
+          {/* Content or actions restricted to regular users */}
+          <button onClick={() => console.log('User action')}>User Action</button>
+        </RoleBasedComponent>
 
-        <Footer/>
+        <Footer />
       </div>
     </Router>
   );
 }
 
 export default App;
+
+
+
 
 
 

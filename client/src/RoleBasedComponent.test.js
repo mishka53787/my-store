@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import RoleBasedComponent from './compenents/RoleBasedComponent';
 
+
+
 test('renders content for admin user', () => {
   render(
     <RoleBasedComponent userRole="admin" allowedRoles={['admin']}>

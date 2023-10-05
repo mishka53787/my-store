@@ -1,6 +1,5 @@
 // Example ProductForm component for adding products
-import React, { useState } from 'react';
-
+import React, { useState } from 'react'
 function ProductForm({ onAddProduct }) {
   const [productData, setProductData] = useState({
     name: '',
@@ -57,3 +56,8 @@ function ProductForm({ onAddProduct }) {
 }
 
 export default ProductForm;
+
+
+
+
+

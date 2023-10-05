@@ -4,6 +4,14 @@ const jwt = require('jsonwebtoken');
 const { User } = require('../models/models'); // Import your models
 
 const router = express.Router();
+const isAdmin = require('../isAdminMiddleware'); // Import the isAdmin middleware
+
+// Route for adding a product (only accessible to admin)
+app.post('/add-product', isAdmin, (req, res) => {
+  // Handle product creation here
+});
+
+
 
 // User Registration
 router.post('/register', async (req, res) => {
