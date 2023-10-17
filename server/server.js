@@ -1,14 +1,17 @@
 // Import required packages
 const express = require('express');
 const mongoose = require('mongoose');
+const passport = require('passport');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const User = require('./models/User'); // Adjust the path to match your project structure
+
 const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 5000;
-// server.js
 
-const isAdmin = require('./isAdminMiddleware'); // Import the isAdmin middleware
+
+const isAdmin = require('./middleware/isAdminMiddleware'); // Import the isAdmin middleware
 
 
 
@@ -35,39 +38,40 @@ useUnifiedTopology: true,
 app.use(express.json());
 app.use(cors());
 
-// Sample User Model (replace with your actual User model)
-const User = mongoose.model('User', {
-username: String,
-password: String,
-});
+// Initialize Passport and configure it to use the strategies
+app.use(passport.initialize());
 
-// Sample Product Model (replace with your actual Product model)
-const Product = mongoose.model('Product', {
-name: String,
-description: String,
-price: Number,
-// Add more fields as needed
-});
+// Include the Passport configuration
+require('./config/passport');
+
+
+
+
+
 
 // Sample JWT Secret (replace with a secure secret)
 const JWT_SECRET = '7e28b7dc04a97d0def889670ade7f42920528be37f67a3b3ea8c8960b5aab23d'; 
 
 // Routes
+//Use your route files
+const authRoutes = require('./routes/auth'); // Import auth routes
+
+app.use('/', authRoutes); // Use auth routes
 
 // User registration
 app.post('/register', async (req, res) => {
-const { username, password } = req.body;
-try {
-  // Hash the password before storing it in the database
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const user = new User({ username, password: hashedPassword });
-  await user.save();
-  res.status(201).json({ message: 'User registered successfully' });
-} catch (error) {
-  console.error(error);
-  res.status(500).json({ error: 'Registration failed' });
-}
-});
+  const { username, password } = req.body;
+  try {
+    // Hash the password before storing it in the database
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({ username, password: hashedPassword });
+    await user.save();
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Registration failed' });
+  }
+  });
 
 // User login
 app.post('/login', async (req, res) => {
@@ -76,11 +80,26 @@ try {
   // Find the user in the database
   const user = await User.findOne({ username });
 
-  // If the user doesn't exist or the password is incorrect, send an error response
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    res.status(401).json({ error: 'Authentication failed' });
-    return;
+  if (!user) {
+    // User not found, handle accordingly
+    return res.status(401).json({ error: 'Authentication failed' });
   }
+  
+  // Compare the provided password with the stored hashed password
+  bcrypt.compare(password, user.password, (err, result) => {
+    if (err) {
+      console.error('Password comparison error:', err);
+      return res.status(500).json({ error: 'Authentication failed' });
+    }
+    if (result) {
+      // Passwords match, user is authenticated
+      // Generate a JWT or perform other authentication tasks here
+      res.status(200).json({ message: 'Authentication successful' });
+    } else {
+      // Passwords do not match, authentication failed
+      res.status(401).json({ error: 'Authentication failed' });
+    }
+  });
 
   // Generate a JWT token
   const token = jwt.sign({ userId: user._id }, JWT_SECRET);
@@ -121,7 +140,7 @@ jwt.verify(token, JWT_SECRET, (err, user) => {
 });
 }
 
-app.post('/products', (req, res) => {
+app.post('/', (req, res) => {
   // Check if the user has admin privileges
   if (req.user && req.user.role === 'admin') {
     // User has admin privileges, allow product creation
@@ -134,6 +153,57 @@ app.post('/products', (req, res) => {
   }
 });
 
+app.post('/add-product', async (req, res) => {
+  try {
+    // Extract product data from the request body
+    const { name, description, price } = req.body;
+
+    // Create a new product instance
+    const newProduct = new Product({
+      name,
+      description,
+      price,
+      // Add more fields as needed
+    });
+
+    // Save the product to the database
+    await newProduct.save();
+
+    // Respond with a success message
+    res.status(201).json({ message: 'Product added successfully' });
+  } catch (error) {
+    console.error('Error adding product:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+
+app.use(express.json());
+
+// Middleware to check user authentication and role
+const authorizeAdmin = (req, res, next) => {
+  const token = req.headers.authorization;
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, secretKey);
+    if (decoded.role === 'admin') {
+      next(); // User is authorized
+    } else {
+      res.status(403).json({ message: 'Forbidden' });
+    }
+  } catch (error) {
+    res.status(401).json({ message: 'Unauthorized' });
+  }
+};
+
+app.post('/add-product', authorizeAdmin, (req, res) => {
+  // Add a product here
+  // ...
+  res.json({ message: 'Product added' });
+});
 
 
 

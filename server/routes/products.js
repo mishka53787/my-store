@@ -4,7 +4,7 @@ const { Product } = require('../models/models'); // Import your models
 const router = express.Router();
 
 // Create a new product
-router.post('/products', async (req, res) => {
+router.post('/', async (req, res) => {
   const { name, description, price } = req.body;
 
   try {
@@ -27,6 +27,18 @@ router.get('/products', async (req, res) => {
     res.status(500).json({ error: 'Failed to retrieve products' });
   }
 });
+
+// Fetch all products
+router.get('/products', async (req, res) => {
+  try {
+    const products = await Product.find();
+    return res.status(200).json(products);
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return res.status(500).json({ error: 'Error fetching products' });
+  }
+});
+        
 
 // Update a product by ID
 router.put('/products/:id', async (req, res) => {

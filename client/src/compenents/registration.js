@@ -5,9 +5,10 @@ function Registration() {
     username: '',
     email: '',
     password: '',
+    role: 'user', // Default role for registration
   });
 
-  const [registrationSuccess, setRegistrationSuccess] = useState(false); // State for registration success
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -16,20 +17,29 @@ function Registration() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Simulate registration success (replace with your actual registration logic)
+
     try {
       // Send registration data to your backend for user registration
-      // Example: const response = await fetch('/api/register', { method: 'POST', body: JSON.stringify(formData) });
-      // Handle the response from the server, and if registration is successful, setRegistrationSuccess(true);
-      // Otherwise, handle the error.
-      // For now, let's simulate success after a delay:
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate an API call delay
-      setRegistrationSuccess(true);
+      const response = await fetch('http://localhost:5000/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        // Registration was successful
+        setRegistrationSuccess(true);
+      } else {
+        // Registration failed, handle the error
+        console.error('Registration failed:', response.statusText);
+      }
     } catch (error) {
-      // Handle registration error here
-      console.error('Registration failed:', error);
+      // Handle any network errors
+      console.error('Network error during registration:', error);
     }
-  };
+  }
 
   return (
     <div>
@@ -38,6 +48,10 @@ function Registration() {
         <input type="text" name="username" placeholder="Username" onChange={handleInputChange} />
         <input type="email" name="email" placeholder="Email" onChange={handleInputChange} />
         <input type="password" name="password" placeholder="Password" onChange={handleInputChange} />
+        <select name="role" value={formData.role} onChange={handleInputChange}>
+          <option value="user">User</option>
+          <option value="admin">Admin</option>
+        </select>
         <button type="submit">Register</button>
       </form>
 

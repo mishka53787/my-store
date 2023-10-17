@@ -43,7 +43,7 @@ Add products to your shopping cart.
 View and manage the items in your shopping cart.
 Complete the checkout process.
 Role-based authentication for admin and regular users.
-Admins can perform CRUD operations on products and users.
+users can perform CRUD operations on products .
 Dependencies
 This project relies on several dependencies, including but not limited to:
 
@@ -57,6 +57,12 @@ mongoose: MongoDB object modeling library.
 jest: JavaScript testing framework.
 react-testing-library: Testing utilities for React components.
 You can find the full list of dependencies in the package.json file
+
+ISSUEs
+bycrypt for login and registration causes the server to crash  due password comparison but will login and register and add to database.
+to add products  or add to cart or  use contact page dont login or register because the if login or regsiter  server will crashes  and be able to add product or add cart or use contact page
+due this issue can not use add product cause if you login or register it will crash .
+if any other issues please see fit to make changes to this application either frontend or backend.
 
 Testing
 You can run tests for the application using the following command:

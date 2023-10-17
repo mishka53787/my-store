@@ -1,78 +1,59 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes,  Navigate } from 'react-router-dom'; // Import useLocation
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from './compenents/Home';
 import Contact from './compenents/Contact';
 import Registration from './compenents/registration';
 import Login from './compenents/login';
 import Products from './compenents/products';
 import Header from './compenents/Header';
-import ShoppingCart from './compenents/ShopCart'; // Import the ShoppingCart component
+import ShoppingCart from './compenents/ShopCart';
 import Footer from './compenents/Footer';
-import RoleBasedComponent from './compenents/RoleBasedComponent';
 import AdminDashboard from './compenents/AdminDashboard';
 
 function App() {
   const [cartItems, setCartItems] = useState([]);
+  const [userRole, setUserRole] = useState(null);
+  const isUserSignedIn = userRole !== null;
 
-  
+  // Define these functions or import them from the appropriate modules
+  const setLoggedInUserRole = (role) => {
+    setUserRole(role);
+  };
 
-
-  // Function to remove items from the cart
   const removeFromCart = (index) => {
-    const updatedCart = [...cartItems];
-    updatedCart.splice(index, 1);
-    setCartItems(updatedCart);
+    // Implement your logic for removing items from the cart
   };
 
-  // Function to clear the entire cart
   const clearCart = () => {
-    setCartItems([]);
+    // Implement your logic for clearing the cart
   };
-
-  const user = {
-    role: 'admin', // This can be 'admin', 'user', or any other role
-  };
-
-  const [userRole] = useState('admin'); // Set the user's role
 
   return (
     <Router>
       <div>
-        <Header /> {/* Use the Header component */}
+        <Header userRole={userRole} />
         <div className="content">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/registration" element={<Registration />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/admin" element={userRole === 'admin' ? <AdminDashboard /> : <Navigate to="/" />} />
-            <Route
-    path="/products"
-    element={<Products userRole={user.role} />} // Pass the user's role as a prop
-  />
-            <Route
-              path="/Cart"
-              element={
-                <ShoppingCart
-                  cartItems={cartItems}
-                  removeFromCart={removeFromCart}
-                  clearCart={clearCart}
-                />
-              }
-            />
+            {!isUserSignedIn && (
+              <Route
+                path="/login"
+                element= {<Login setLoggedInUserRole={setLoggedInUserRole }userRole={userRole} />}
+                          />  )
+            }
+            {isUserSignedIn && (
+              <>
+        <Route path="/products" element={<Products userRole={userRole} />} />
+                <Route path="/Shopcart" element={<ShoppingCart cartItems={cartItems} />} />
+                {userRole === 'admin' && (
+                  <Route path="/admin" element={<AdminDashboard />} />
+                )}
+              </>
+          )  }
           </Routes>
         </div>
-        
-        <RoleBasedComponent userRole={user.role} allowedRoles={['admin']}>
-          {/* Content or actions restricted to admin users */}
-          <button onClick={() => console.log('Admin action')}>Admin Action</button>
-        </RoleBasedComponent>
-
-        <RoleBasedComponent userRole={user.role} allowedRoles={['user']}>
-          {/* Content or actions restricted to regular users */}
-          <button onClick={() => console.log('User action')}>User Action</button>
-        </RoleBasedComponent>
-
         <Footer />
       </div>
     </Router>
@@ -80,6 +61,12 @@ function App() {
 }
 
 export default App;
+
+
+
+
+
+
 
 
 

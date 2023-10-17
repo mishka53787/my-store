@@ -15,11 +15,6 @@ function Products({ userRole }) {
   // State to manage product data and form visibility
   const [showProductForm, setShowProductForm] = useState(false);
 
-  // Function to toggle the form visibility
-  const toggleProductForm = () => {
-    setShowProductForm(!showProductForm);
-  };
-
   // Function to fetch products from the server
   const fetchProducts = async () => {
     try {
@@ -46,10 +41,21 @@ function Products({ userRole }) {
   };
 
   // Function to handle adding a new product
-  const handleAddProduct = (productData) => {
-    // Implement logic to add the new product to the products list
-    // For example, you can make an API request to your server here
-    console.log('Adding new product:', productData);
+  const handleAddProduct = async (productData) => {
+    try {
+      // Send a POST request to your backend route for adding a product
+      const response = await axios.post('http://localhost:5000/add-product', productData);
+
+      // If the product is successfully added, update the product list
+      if (response.status === 201) {
+        fetchProducts(); // Refresh the product list
+        setShowProductForm(false); // Hide the product form
+      } else {
+        console.error('Failed to add product:', response.data.error);
+      }
+    } catch (error) {
+      console.error('Error adding product:', error);
+    }
   };
 
   useEffect(() => {
@@ -79,7 +85,9 @@ function Products({ userRole }) {
       ))}
       {/* Render the "Add Product" button only if the user has admin privileges */}
       {isAdmin && (
-        <button onClick={toggleProductForm}>Add Product</button>
+        <button onClick={() => setShowProductForm(!showProductForm)}>
+          Add Product
+        </button>
       )}
 
       {/* Conditionally render the "Add Product" form only for admin users */}
@@ -91,6 +99,8 @@ function Products({ userRole }) {
 }
 
 export default Products;
+
+
 
 
 

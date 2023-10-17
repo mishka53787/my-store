@@ -13,54 +13,48 @@ app.post('/add-product', isAdmin, (req, res) => {
 
 
 
-// User Registration
+// Registration route
 router.post('/register', async (req, res) => {
-  const { username, password } = req.body;
-  
   try {
+    const { username, password } = req.body;
+
     // Check if the user already exists
     const existingUser = await User.findOne({ username });
     if (existingUser) {
-      return res.status(400).json({ error: 'Username already exists' });
+      return res.status(400).json({ error: 'User already exists' });
     }
 
-    // Hash the password before saving it
-    const hashedPassword = await bcrypt.hash(password, 10);
-    
-    // Create a new user
-    const newUser = new User({ username, password: hashedPassword });
+    // Create a new user and save it to the database
+    const newUser = new User({ username, password });
     await newUser.save();
-    
-    // Create and send a JWT token
-    const token = jwt.sign({ userId: newUser._id }, 'your-secret-key', { expiresIn: '1h' });
-    res.status(201).json({ token });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Registration failed' });
-  }
-});
 
-// User Login
+    return res.status(201).json(newUser);
+  } catch (error) {
+    console.error('Registration failed:', error);
+    return res.status(500).json({ error: 'Registration failed' });
+  }
+})
+
+// Add this route to your Express app
 router.post('/login', async (req, res) => {
-  const { username, password } = req.body;
-
   try {
-    // Find the user in the database
-    const user = await User.findOne({ username });
+    const { usernameOrEmail, password } = req.body;
 
-    // If the user doesn't exist or the password is incorrect, send an error response
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({ error: 'Authentication failed' });
-    }
+    // Authenticate the user based on username or email and password
+    // Check if the user exists and if the provided password matches the hashed password in the database
+    // Generate a JWT token and send it back if login is successful
 
-    // Create and send a JWT token
-    const token = jwt.sign({ userId: user._id }, 'your-secret-key', { expiresIn: '1h' });
-    res.status(200).json({ token });
+    // If successful, send a JSON response with the token
+    // Example: res.status(200).json({ token: generatedToken });
+
+    // If login fails, send an error response
+    // Example: res.status(401).json({ error: 'Login failed' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Login failed' });
+    console.error('Login failed:', error);
+    return res.status(500).json({ error: 'Login failed' });
   }
 });
+
 
 function authenticateToken(req, res, next) {
   const token = req.header('Authorization');
