@@ -64,6 +64,14 @@ to add products  or add to cart or  use contact page dont login or register beca
 due this issue can not use add product cause if you login or register it will crash .
 if any other issues please see fit to make changes to this application either frontend or backend.
 
+for Login
+
+please use the 
+{usernameOrEmail: "bibi@gmail.com", password: "revenge"}
+
+any other will have 
+401 unauthorized error
+
 Testing
 You can run tests for the application using the following command:
 
