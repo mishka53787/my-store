@@ -27,4 +27,24 @@ function checkUserRole(role) {
   });
   
 
+
+const passportJWT = require('passport-jwt');
+
+const JWTStrategy = passportJWT.Strategy;
+const ExtractJWT = passportJWT.ExtractJwt;
+
+const jwtOptions = {
+  jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+  secretOrKey: 'your-secret-key',
+};
+
+passport.use(
+  new JWTStrategy(jwtOptions, (jwtPayload, done) => {
+    // Find the user in your database if needed
+    // Check if the user exists, and if so, call 'done(null, user)'
+    // If the user doesn't exist or there's an error, call 'done(error)'
+  })
+);
+
+
 module.exports = { requireAuth };

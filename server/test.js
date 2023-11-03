@@ -2,6 +2,8 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const app = require('./server'); // Import your Express app
 const expect = chai.expect;
+const jwt = require('jsonwebtoken');
+const app = require('./server'); // Import your Express app
 
 chai.use(chaiHttp);
 

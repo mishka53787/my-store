@@ -5,7 +5,6 @@ function Registration() {
     username: '',
     email: '',
     password: '',
-    role: 'user', // Default role for registration
   });
 
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
@@ -19,7 +18,6 @@ function Registration() {
     e.preventDefault();
 
     try {
-      // Send registration data to your backend for user registration
       const response = await fetch('http://localhost:5000/register', {
         method: 'POST',
         headers: {
@@ -31,35 +29,54 @@ function Registration() {
       if (response.ok) {
         // Registration was successful
         setRegistrationSuccess(true);
+
+        // Automatically log in after successful registration
+        loginUser(formData.username, formData.password);
       } else {
-        // Registration failed, handle the error
         console.error('Registration failed:', response.statusText);
       }
     } catch (error) {
-      // Handle any network errors
       console.error('Network error during registration:', error);
     }
   }
 
+  const loginUser = async (username, password) => {
+    try {
+      // Perform the login logic with username and password
+      const loginResponse = await fetch('http://localhost:5000/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ usernameOrEmail: username, password }),
+      });
+
+      if (loginResponse.ok) {
+        // Login is successful
+        console.log('Auto-login successful');
+        // Handle further actions or redirect the user
+      } else {
+        console.error('Auto-login failed:', loginResponse.statusText);
+      }
+    } catch (error) {
+      console.error('Auto-login failed:', error);
+    }
+  };
+  
   return (
     <div>
       <h1>User Registration</h1>
       <form onSubmit={handleSubmit}>
+        {/* Input fields for registration */}
         <input type="text" name="username" placeholder="Username" onChange={handleInputChange} />
         <input type="email" name="email" placeholder="Email" onChange={handleInputChange} />
         <input type="password" name="password" placeholder="Password" onChange={handleInputChange} />
-        <select name="role" value={formData.role} onChange={handleInputChange}>
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
         <button type="submit">Register</button>
       </form>
-
-      {/* Display the pop-up message if registrationSuccess is true */}
+      {/* Display success message if registration was successful */}
       {registrationSuccess && (
         <div className="success-popup">
           <p>Registration successful!</p>
-          <button onClick={() => setRegistrationSuccess(false)}>Close</button>
         </div>
       )}
     </div>
@@ -67,4 +84,3 @@ function Registration() {
 }
 
 export default Registration;
-
