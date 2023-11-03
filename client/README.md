@@ -188,6 +188,10 @@ If you face an issue with login failing and receiving a 500 (Internal Server Err
 
 This section in your README file will help users understand and troubleshoot these common issues.
 
+Deployment
+To access the code and deployed application, you can visit the GitHub repository:
+[My Awesome E-commerce Web App on GitHub](https://github.com/mishka53787/my-store)
+
 
 
 
