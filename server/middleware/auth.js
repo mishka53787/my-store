@@ -19,13 +19,49 @@ function checkUserRole(role) {
       }
     };
   }
+  // Middleware to check if the user has the "admin" role
+function isAdmin(req, res, next) {
+  // Assuming you have extracted user details from the token
+  const user = req.user; // Extracted user information from the token
+
+  if (user.role === 'admin') {
+    // The user has the "admin" role, so they are authorized
+    next();
+  } else {
+    // The user doesn't have the "admin" role, so they are unauthorized
+    return res.status(403).json({ message: 'Access forbidden' });
+  }
+}
+
   
-  // Protect the route with the middleware
-  app.post('/add-product', checkUserRole('admin'), (req, res) => {
-    // Only users with the 'admin' role can add a product
-    // Handle product creation logic here
-  });
-  
+  // Middleware to check if the user is authenticated
+function isAuthenticated(req, res, next) {
+  const token = req.header('Authorization'); // Get the token from the request header
+  if (!token) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+
+  // Verify the token and extract user information
+  // If the token is valid, you can access user details, including their role
+  // You should implement this JWT verification logic
+  // ...
+
+  // Proceed to the next middleware or route handler
+  next();
+}
+// middleware/authenticate.js
+
+const authenticate = (req, res, next) => {
+  // Check if the user is authenticated
+  if (req.session.user) {
+    return next(); // User is authenticated, continue to the next middleware or route
+  }
+  // User is not authenticated, redirect to the login page or send an error response
+  return res.status(401).json({ message: 'Unauthorized' });
+};
+
+module.exports = authenticate;
+
 
 
 const passportJWT = require('passport-jwt');

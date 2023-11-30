@@ -1,4 +1,3 @@
-// Import required packages
 const express = require('express');
 const mongoose = require('mongoose');
 const passport = require('passport');
@@ -9,6 +8,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 5000;
+const  Product  = require('./models/Product'); // Import your models
 
 
 const dotenv = require('dotenv'); // Include dotenv
@@ -124,7 +124,7 @@ app.post('/register', async (req, res) => {
 
     // Save the user to the database
     await user.save();
-
+    console.log(user)
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
     console.error(error);
@@ -149,7 +149,9 @@ app.post('/login', async (req, res) => {
       // User not found
       return res.status(401).json({ error: 'Authentication failed' });
     }
-
+    const userId = req.user.id; // Get the authenticated user's ID
+    const newCart = new Cart({ user: userId }); // Create a new cart associated with the user
+    await newCart.save();
     if (user.password) {
       // Compare the provided password with the stored hashed password using async/await
       const result = await bcrypt.compare(password, user.password);
@@ -174,8 +176,45 @@ app.post('/login', async (req, res) => {
     res.status(500).json({ error: 'Login failed' });
   }
 });
+// Sample route for adding an item to the user's cart (protected, user-specific)
+app.post('/cart/add', passport.authenticate('jwt', { session: false }), (req, res) => {
+  // Logic to add an item to the user's cart
+  // Ensure you have the user's ID from the JWT payload to associate the item with the user.
+  const userId = req.user._id;
 
+  // Sample logic: You can add the item to the user's cart in the database.
+  // Replace this with your actual database logic.
+  // Example using Mongoose:
+   const newItem = { productId: 'your-product-id', quantity: 1 };
+   User.findByIdAndUpdate(userId, { $push: { cart: newItem } }, (err, user) => {
+   if (err) {
+     return res.status(500).json({ message: 'Error adding item to cart' });
+   }
+     return res.status(201).json({ message: 'Item added to cart' });
+   });
 
+  res.status(201).json({ message: 'Item added to cart' });
+});
+
+// Sample route for removing an item from the user's cart (protected, user-specific)
+app.post('/cart/remove', passport.authenticate('jwt', { session: false }), (req, res) => {
+  // Logic to remove an item from the user's cart
+  // Ensure you have the user's ID from the JWT payload to identify the user.
+  const userId = req.user._id;
+
+  // Sample logic: You can remove the item from the user's cart in the database.
+  // Replace this with your actual database logic.
+  // Example using Mongoose:
+   const productId = 'your-product-id';
+   User.findByIdAndUpdate(userId, { $pull: { cart: { productId } } }, (err, user) => {
+     if (err) {
+       return res.status(500).json({ message: 'Error removing item from cart' });
+    }
+    return res.status(200).json({ message: 'Item removed from cart' });
+ });
+
+  res.status(200).json({ message: 'Item removed from cart' });
+});
 
 app.get('/authenticated', passport.authenticate('jwt', { session: false }), (req, res) => {
   // If the middleware passes, the user is authenticated
@@ -287,7 +326,7 @@ app.post('/add-product', async (req, res) => {
     // Extract product data from the request body
     const { name, description, price } = req.body;
 
-    // Create a new product instance
+    // Create a new product instance using the Product model
     const newProduct = new Product({
       name,
       description,
@@ -305,6 +344,7 @@ app.post('/add-product', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
 
 
 app.use(express.json());
@@ -332,6 +372,8 @@ app.post('/add-product', authorizeAdmin, (req, res) => {
   // Add a product here
   // ...
   res.json({ message: 'Product added' });
+console.log( 'product added')
+
 });
 
 

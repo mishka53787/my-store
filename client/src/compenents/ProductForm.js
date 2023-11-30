@@ -1,10 +1,11 @@
-// Example ProductForm component for adding products
-import React, { useState } from 'react'
-function ProductForm({ onAddProduct }) {
+import React, { useState } from 'react';
+
+function ProductForm({ onAddProduct, onaddproductlist }) {
   const [productData, setProductData] = useState({
     name: '',
     description: '',
     price: '',
+    imageURL: '', // Added imageURL field
     // Add more fields as needed
   });
 
@@ -17,11 +18,13 @@ function ProductForm({ onAddProduct }) {
     e.preventDefault();
     // Send the product data to the server for creation
     onAddProduct(productData);
+    onaddproductlist(productData); 
     // Clear the form fields
     setProductData({
       name: '',
       description: '',
       price: '',
+      imageURL: '', // Clear imageURL field
       // Clear other fields as needed
     });
   };
@@ -49,6 +52,14 @@ function ProductForm({ onAddProduct }) {
         onChange={handleInputChange}
         placeholder="Product Price"
       />
+      {/* Added input field for imageURL */}
+      <input
+        type="text"
+        name="imageURL"
+        value={productData.imageURL}
+        onChange={handleInputChange}
+        placeholder="Image URL"
+      />
       {/* Add more fields as needed */}
       <button type="submit">Add Product</button>
     </form>
@@ -56,8 +67,3 @@ function ProductForm({ onAddProduct }) {
 }
 
 export default ProductForm;
-
-
-
-
-

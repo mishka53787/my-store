@@ -4,68 +4,82 @@ import ProductForm from './ProductForm';
 import axios from 'axios';
 
 function Products({ userRole }) {
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState([]); // Initialize products state with an empty array
   const [cartItems, setCartItems] = useState([]);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [fetchNewData, setFetchNewData] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const user = {
-    role: 'admin', // This can be 'admin', 'user', or any other role
+    role: 'admin',
   };
 
-  const isAdmin = user && user.role === 'admin';
+  useEffect(() => {
+    setIsAdmin(user.role === 'admin');
+  }, [user.role]);
 
-  // State to manage product data and form visibility
+  const handleUserLogin = () => {
+    setLoggedIn(true);
+  };
+
   const [showProductForm, setShowProductForm] = useState(false);
 
-  // Function to fetch products from the server
   const fetchProducts = async () => {
     try {
       const response = await axios.get('http://localhost:5000/products');
-      setProducts(response.data);
+      setProducts(response.data || []); // Ensure that response.data is an array or initialize as an empty array
     } catch (error) {
       console.error('Error fetching products:', error);
     }
   };
 
-  // Static products data
   const staticProducts = [
     { id: 1, name: 'MyHeroAcademia', price: 'R180' },
     { id: 2, name: 'FairyTail100YearQuest', price: 'R180' },
     { id: 3, name: 'Haikyuu', price: 'R180' },
     { id: 4, name: 'Kakashitshirt', price: 'R200' },
-    // Add more static products as needed
   ];
 
   const addToCart = (product) => {
-    // Create a new array with the added product
-    const updatedCart = [...cartItems, product];
-    setCartItems(updatedCart);
+    if (isAdmin) {
+      const updatedCart = [...cartItems, product];
+      setCartItems(updatedCart);
+      alert('Item added to cart!');
+    } else {
+      alert('Only admin users can add items to the cart.');
+    }
   };
 
-  // Function to handle adding a new product
-  const handleAddProduct = async (productData) => {
-    try {
-      // Send a POST request to your backend route for adding a product
-      const response = await axios.post('http://localhost:5000/add-product', productData);
+  const addProductToList = (newProduct) => {
+    setProducts([...products, newProduct]);
+  };
 
-      // If the product is successfully added, update the product list
-      if (response.status === 201) {
-        fetchProducts(); // Refresh the product list
-        setShowProductForm(false); // Hide the product form
-      } else {
-        console.error('Failed to add product:', response.data.error);
+  const handleAddProduct = async (productData) => {
+    if (isAdmin) {
+      try {
+        const response = await axios.post('http://localhost:5000/add-product', productData);
+
+        if (response.status === 201) {
+          alert('Product added successfully!');
+          setFetchNewData(!fetchNewData); // Toggle fetchNewData to trigger fetching updated products
+          setShowProductForm(false);
+        } else {
+          console.error('Failed to add product:', response.data.error);
+        }
+      } catch (error) {
+        console.error('Error adding product:', error);
       }
-    } catch (error) {
-      console.error('Error adding product:', error);
+    } else {
+      console.error('Only admin users can add products.');
     }
   };
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [fetchNewData]);
 
   return (
     <div>
       <h1>Shop</h1>
-      {/* Display products from the API */}
       {products.map((product) => (
         <ProductItem
           key={product.id}
@@ -74,7 +88,6 @@ function Products({ userRole }) {
           onAddToCart={() => addToCart(product)}
         />
       ))}
-      {/* Display static products */}
       {staticProducts.map((product) => (
         <ProductItem
           key={product.id}
@@ -83,29 +96,22 @@ function Products({ userRole }) {
           onAddToCart={() => addToCart(product)}
         />
       ))}
-      {/* Render the "Add Product" button only if the user has admin privileges */}
       {isAdmin && (
         <button onClick={() => setShowProductForm(!showProductForm)}>
           Add Product
         </button>
       )}
-
-      {/* Conditionally render the "Add Product" form only for admin users */}
       {isAdmin && showProductForm && (
-        <ProductForm onAddProduct={handleAddProduct} />
+     <ProductForm onAddProduct={handleAddProduct} onaddproductlist={addProductToList} />
+      )}
+      {!loggedIn && (
+        <button onClick={handleUserLogin}>
+          Log In
+        </button>
       )}
     </div>
   );
 }
 
 export default Products;
-
-
-
-
-
-  
-
-
-
 

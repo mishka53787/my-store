@@ -103,5 +103,58 @@ router.get('/protected-route', authenticateToken, (req, res) => {
   res.status(200).json({ message: 'Protected route', user: req.user });
 });
 
+const { User, Order } = require('../models'); // Import User and Order models
+
+// Get user profile by ID
+router.get('/users/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    res.json(user);
+  } catch (error) {
+    res.status(404).json({ error: 'User not found' });
+  }
+});
+
+// Update user profile
+router.put('/users/:id', async (req, res) => {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updatedUser);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Get orders for a user
+router.get('/users/:id/orders', async (req, res) => {
+  try {
+    const orders = await Order.find({ userId: req.params.id });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Update user profile
+router.put('/users/:id', async (req, res) => {
+  try {
+    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updatedUser);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Delete user
+router.delete('/users/:id', async (req, res) => {
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ message: 'User deleted successfully' });
+  } catch (error) {
+    res.status(
+      400).json({ error: error.message });
+  }
+});
+
 module.exports = router;
 

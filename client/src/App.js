@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router, Route,Routes , Navigate} from 'react-router-dom';
-import Header from './compenents/Header'
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import Header from './compenents/Header';
 import Home from './compenents/Home';
 import Contact from './compenents/Contact';
 import Registration from './compenents/registration';
@@ -9,19 +9,20 @@ import Products from './compenents/products';
 import ShoppingCart from './compenents/ShopCart';
 import AdminDashboard from './compenents/AdminDashboard';
 import NotFound from './compenents/NotFound';
-import Footer from './compenents/Footer'
+import Footer from './compenents/Footer';
+
+import Profile from './compenents/profile';
 
 function App() {
   const [userRole, setUserRole] = useState(null);
-  
-  const cartItems = [] // Define cartItems as an array
+  const cartItems = []; // Define cartItems as an array
 
   return (
     <Router>
       <div>
-      <Header userRole={userRole} />
-     
-        <Routes> {/* Use the Routes component here */}
+        <Header userRole={userRole} />
+
+        <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/contact" element={<Contact />} />
           <Route
@@ -45,23 +46,21 @@ function App() {
             }
           />
           <Route path="/products" element={<Products />} />
-  <Route path="/cart" element={<ShoppingCart cartItems={cartItems} />} />
-          {userRole === 'admin' && (
-            <Route
-              path="/admin"
-              element={
-                userRole === 'admin' ? (
-                  <AdminDashboard />
-                ) : (
-                  <Navigate to="/dashboard" />
-                )
-              }
-            />
-          )}
+          <Route path="/cart" element={<ShoppingCart cartItems={cartItems} />} />
+
+
+          {/* Profile Route */}
           <Route
-            path="*"
-            element={<NotFound />}
+            path="/profile"
+            element={<Profile userRole={userRole} />}
           />
+
+          {/* Admin Dashboard Route */}
+          {userRole === 'admin' && (
+            <Route path="/admin" element={<AdminDashboard />} />
+          )}
+
+          <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />
       </div>
